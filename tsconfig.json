@@ -6,7 +6,6 @@
         "moduleResolution": "node",
         "strict": true,
         "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": true,
         "lib": ["es6", "dom"],
         "sourceMap": true,
         "outDir": ".tmp/build/src",
