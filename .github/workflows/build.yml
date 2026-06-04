@@ -28,12 +28,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ── Quality gates ──────────────────────────────────────────────────────
+
+      - name: Audit dependencies (high+ only)
+        # Fails on high or critical severity vulnerabilities.
+        # Moderate findings in the build toolchain are tracked but not blocking.
+        run: npm audit --audit-level=high
+
+      - name: Static security scan
+        # Blocks forbidden APIs (innerHTML, eval, fetch, WebSocket…) and
+        # validates that all runtime dependencies are from approved publishers.
+        run: node scripts/check-security.js
+
+      - name: Type check
+        run: npx tsc --noEmit
+
       - name: Lint
         run: npm run lint
 
+      # ── Build ──────────────────────────────────────────────────────────────
+
       - name: Package visual
         run: npm run package
-        # prepackage (generate-icon.js) runs automatically before this
+        # prepackage (generate-icon.js) runs automatically before this step
+
+      # ── Artifacts ─────────────────────────────────────────────────────────
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
