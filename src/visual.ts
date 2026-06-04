@@ -50,7 +50,10 @@ export class Visual implements IVisual {
     private initialized: boolean = false;
     private searchText: string = "";
 
-    constructor(options: VisualConstructorOptions) {
+    constructor(options?: VisualConstructorOptions) {
+        if (!options) {
+            throw new Error("VisualConstructorOptions is required");
+        }
         this.host = options.host;
         this.buildDOM(options.element);
         this.bindEvents();
