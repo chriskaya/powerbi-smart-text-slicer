@@ -1,0 +1,24 @@
+{
+  "name": "powerbi-smart-text-slicer",
+  "version": "1.0.0",
+  "description": "A searchable dropdown slicer for Power BI with multi-select and async data loading",
+  "scripts": {
+    "prepackage": "node scripts/generate-icon.js",
+    "package": "pbiviz package",
+    "start": "pbiviz start",
+    "lint": "eslint src --ext .ts"
+  },
+  "author": "chriskaya",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "powerbi-visuals-tools": "^5.5.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "powerbi-models": "^1.0.0",
+    "powerbi-visuals-api": "~5.3.0"
+  }
+}

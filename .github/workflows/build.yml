@@ -1,0 +1,49 @@
+name: Build and Package
+
+on:
+  push:
+    branches: ["main", "feat/**", "fix/**", "chore/**"]
+  pull_request:
+    branches: ["main"]
+  release:
+    types: [created]
+
+permissions:
+  contents: write  # needed to attach artifacts to releases
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Package visual
+        run: npm run package
+        # prepackage (generate-icon.js) runs automatically before this
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smart-text-slicer-${{ github.sha }}
+          path: dist/*.pbiviz
+          retention-days: 30
+
+      - name: Attach .pbiviz to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.pbiviz

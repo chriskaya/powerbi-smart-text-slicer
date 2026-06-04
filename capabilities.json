@@ -1,0 +1,42 @@
+{
+    "dataRoles": [
+        {
+            "name": "category",
+            "kind": "Grouping",
+            "displayName": "Field",
+            "description": "The column to search and filter on"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "category": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "select": [
+                        { "bind": { "to": "category" } }
+                    ],
+                    "dataReductionAlgorithm": {
+                        "window": { "count": 30000 }
+                    }
+                }
+            }
+        }
+    ],
+    "objects": {
+        "general": {
+            "properties": {
+                "filter": {
+                    "type": { "filter": {} }
+                },
+                "selection": {
+                    "type": { "text": {} }
+                }
+            }
+        }
+    },
+    "supportsHighlight": false,
+    "suppressDefaultTitle": true,
+    "supportsSynchronizingFilterState": true
+}

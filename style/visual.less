@@ -1,0 +1,228 @@
+// Power BI blue
+@accent: #0078d4;
+@accent-dark: #005a9e;
+@border: #c8c8c8;
+@bg: #ffffff;
+@hover: #f3f2f1;
+@text: #323130;
+@text-muted: #605e5c;
+@separator: #edebe9;
+
+.sts-root {
+    position: relative;
+    font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif;
+    font-size: 13px;
+    color: @text;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    // ── Header ──────────────────────────────────────────────────────────────
+    .sts-header {
+        display: flex;
+        align-items: center;
+        border: 1px solid @border;
+        border-radius: 2px;
+        background: @bg;
+        cursor: pointer;
+        padding: 4px 8px;
+        min-height: 30px;
+        gap: 4px;
+        transition: border-color 0.1s;
+
+        &:hover {
+            border-color: @accent;
+        }
+    }
+
+    .sts-input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: inherit;
+        font-family: inherit;
+        color: @text;
+        cursor: text;
+
+        &::placeholder {
+            color: @text-muted;
+        }
+    }
+
+    .sts-badge {
+        flex-shrink: 0;
+        background: @accent;
+        color: #fff;
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 16px;
+    }
+
+    .sts-arrow {
+        flex-shrink: 0;
+        color: @text-muted;
+        font-size: 9px;
+        user-select: none;
+        line-height: 1;
+    }
+
+    // ── Dropdown ─────────────────────────────────────────────────────────────
+    .sts-dropdown {
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 0;
+        right: 0;
+        background: @bg;
+        border: 1px solid @border;
+        border-radius: 2px;
+        z-index: 9999;
+        max-height: 260px;
+        overflow-y: auto;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+        // Thin scrollbar
+        &::-webkit-scrollbar { width: 6px; }
+        &::-webkit-scrollbar-track { background: transparent; }
+        &::-webkit-scrollbar-thumb {
+            background: @border;
+            border-radius: 3px;
+        }
+    }
+
+    // ── Items ────────────────────────────────────────────────────────────────
+    .sts-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 8px;
+        cursor: pointer;
+        user-select: none;
+        gap: 8px;
+
+        &:hover {
+            background: @hover;
+        }
+
+        &.sts-item--checked {
+            font-weight: 600;
+        }
+
+        &.sts-select-all {
+            background: #faf9f8;
+            font-weight: 600;
+            font-size: 12px;
+            color: @text-muted;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+    }
+
+    // ── Checkbox ─────────────────────────────────────────────────────────────
+    .sts-check {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border: 1.5px solid @border;
+        border-radius: 2px;
+        background: @bg;
+        transition: background 0.1s, border-color 0.1s;
+
+        &.sts-check--on {
+            background: @accent;
+            border-color: @accent;
+
+            &::after {
+                content: "";
+                display: block;
+                width: 4px;
+                height: 8px;
+                border: 2px solid #fff;
+                border-top: none;
+                border-left: none;
+                transform: rotate(45deg) translate(-1px, -1px);
+            }
+        }
+
+        &.sts-check--partial {
+            background: @accent;
+            border-color: @accent;
+
+            &::after {
+                content: "";
+                display: block;
+                width: 8px;
+                height: 2px;
+                background: #fff;
+                border-radius: 1px;
+            }
+        }
+    }
+
+    .sts-label {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // ── Separator ────────────────────────────────────────────────────────────
+    .sts-separator {
+        height: 1px;
+        background: @separator;
+        margin: 0;
+    }
+
+    .sts-list-sep {
+        margin: 2px 0;
+        opacity: 0.6;
+    }
+
+    // ── Loader ───────────────────────────────────────────────────────────────
+    .sts-loader {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        color: @text-muted;
+        font-size: 12px;
+    }
+
+    .sts-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid @separator;
+        border-top-color: @accent;
+        border-radius: 50%;
+        animation: sts-spin 0.7s linear infinite;
+        flex-shrink: 0;
+    }
+
+    // ── Empty state ──────────────────────────────────────────────────────────
+    .sts-empty {
+        padding: 12px 10px;
+        text-align: center;
+        color: @text-muted;
+        font-style: italic;
+        font-size: 12px;
+    }
+
+    // ── List container ───────────────────────────────────────────────────────
+    .sts-list {
+        // Grows naturally with content
+    }
+
+    @keyframes sts-spin {
+        to { transform: rotate(360deg); }
+    }
+}
