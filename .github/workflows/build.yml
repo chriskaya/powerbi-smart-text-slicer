@@ -34,9 +34,10 @@ jobs:
         run: npm audit --audit-level=high
 
       - name: Static security scan
-        # Blocks forbidden APIs (innerHTML, eval, fetch, WebSocket…) and
-        # validates that all runtime dependencies are from approved publishers.
-        run: node scripts/check-security.js
+        # Blocks 22 forbidden APIs (eval, innerHTML, fetch, WebSocket, localStorage,
+        # postMessage, dynamic import, Worker…), URL string literals, externalJS in
+        # pbiviz.json, non-empty privileges, and non-Microsoft runtime deps.
+        run: node scripts/check-security.mjs
 
       - name: Type check
         # Uses the project tsconfig (noImplicitAny, skipLibCheck).
