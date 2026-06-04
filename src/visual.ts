@@ -1,7 +1,6 @@
 "use strict";
 
 import powerbi from "powerbi-visuals-api";
-import { BasicFilter, IFilterColumnTarget } from "powerbi-models";
 
 type VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 type VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
@@ -9,6 +8,20 @@ type IVisual = powerbi.extensibility.visual.IVisual;
 type IVisualHost = powerbi.extensibility.visual.IVisualHost;
 type DataViewCategoryColumn = powerbi.DataViewCategoryColumn;
 type DataView = powerbi.DataView;
+
+// Matches Power BI's BasicFilter JSON schema — no external package required.
+interface IFilterColumnTarget {
+    table: string;
+    column: string;
+}
+
+interface IBasicFilter {
+    $schema: string;
+    target: IFilterColumnTarget;
+    filterType: number; // 1 = Basic
+    operator: string;   // "In"
+    values: (string | number | boolean)[];
+}
 
 interface Elements {
     root: HTMLElement;
@@ -46,9 +59,9 @@ export class Visual implements IVisual {
     // ─── DOM ─────────────────────────────────────────────────────────────────
 
     private buildDOM(container: HTMLElement): void {
-        const root = this.el_div("sts-root");
+        const root = this.div("sts-root");
 
-        const header = this.el_div("sts-header");
+        const header = this.div("sts-header");
         const input = document.createElement("input");
         input.type = "text";
         input.className = "sts-input";
@@ -56,34 +69,34 @@ export class Visual implements IVisual {
         input.setAttribute("autocomplete", "off");
         input.setAttribute("spellcheck", "false");
 
-        const badge = this.el_span("sts-badge");
+        const badge = this.span("sts-badge");
         badge.style.display = "none";
 
-        const arrow = this.el_span("sts-arrow");
+        const arrow = this.span("sts-arrow");
         arrow.textContent = "▼";
 
         header.appendChild(input);
         header.appendChild(badge);
         header.appendChild(arrow);
 
-        const dropdown = this.el_div("sts-dropdown");
+        const dropdown = this.div("sts-dropdown");
         dropdown.style.display = "none";
 
-        const selectAllItem = this.el_div("sts-item sts-select-all");
-        const selectAllCheck = this.el_span("sts-check");
-        const selectAllLabel = this.el_span("sts-label");
+        const selectAllItem = this.div("sts-item sts-select-all");
+        const selectAllCheck = this.span("sts-check");
+        const selectAllLabel = this.span("sts-label");
         selectAllLabel.textContent = "Select all";
         selectAllItem.appendChild(selectAllCheck);
         selectAllItem.appendChild(selectAllLabel);
 
-        const topSep = this.el_div("sts-separator");
+        const topSep = this.div("sts-separator");
 
-        const list = this.el_div("sts-list");
+        const list = this.div("sts-list");
 
-        const loader = this.el_div("sts-loader");
+        const loader = this.div("sts-loader");
         loader.style.display = "none";
-        const spinner = this.el_span("sts-spinner");
-        const loaderText = this.el_span("");
+        const spinner = this.span("sts-spinner");
+        const loaderText = this.span("");
         loaderText.textContent = "Loading...";
         loader.appendChild(spinner);
         loader.appendChild(loaderText);
@@ -100,13 +113,13 @@ export class Visual implements IVisual {
         this.el = { root, header, input, badge, arrow, dropdown, selectAllItem, selectAllCheck, list, loader };
     }
 
-    private el_div(cls: string): HTMLDivElement {
+    private div(cls: string): HTMLDivElement {
         const el = document.createElement("div");
         if (cls) el.className = cls;
         return el;
     }
 
-    private el_span(cls: string): HTMLSpanElement {
+    private span(cls: string): HTMLSpanElement {
         const el = document.createElement("span");
         if (cls) el.className = cls;
         return el;
@@ -153,7 +166,7 @@ export class Visual implements IVisual {
         }
 
         // Detect column change → reset state
-        const newKey = category.source.queryName;
+        const newKey = category.source.queryName ?? category.source.displayName;
         if (newKey !== this.filterTargetKey) {
             this.filterTargetKey = newKey;
             this.filterTarget = this.buildFilterTarget(category);
@@ -161,11 +174,11 @@ export class Visual implements IVisual {
             this.initialized = false;
         }
 
-        // With aggregateSegments:true, Power BI accumulates data before each update call.
-        // We rebuild allValues from the growing snapshot each time.
+        // With aggregateSegments:true, Power BI accumulates data before each update.
+        // We rebuild allValues from the growing snapshot on each call.
         this.allValues = this.extractUniqueValues(category);
 
-        // Request next segment; returns false when all data is loaded.
+        // Request next segment — returns false when all data is loaded.
         const hasMore = this.host.fetchMoreData(true);
         this.isLoading = hasMore;
 
@@ -201,6 +214,9 @@ export class Visual implements IVisual {
 
     private buildFilterTarget(category: DataViewCategoryColumn): IFilterColumnTarget {
         const qn = category.source.queryName;
+        if (!qn) {
+            return { table: "", column: category.source.displayName };
+        }
         const dot = qn.indexOf(".");
         return dot > -1
             ? { table: qn.substring(0, dot), column: qn.substring(dot + 1) }
@@ -209,7 +225,8 @@ export class Visual implements IVisual {
 
     private restoreSelection(dataView: DataView): void {
         try {
-            const stored = dataView.metadata?.objects?.["general"]?.["selection"] as string | undefined;
+            const raw = dataView.metadata?.objects?.["general"]?.["selection"];
+            const stored = (raw as unknown) as string | undefined;
             if (stored) {
                 const parsed = JSON.parse(stored) as string[];
                 this.selectedValues = new Set(parsed);
@@ -240,13 +257,13 @@ export class Visual implements IVisual {
         for (const val of selected) list.appendChild(this.createItem(val, true));
 
         if (selected.length > 0 && unselected.length > 0) {
-            list.appendChild(this.el_div("sts-separator sts-list-sep"));
+            list.appendChild(this.div("sts-separator sts-list-sep"));
         }
 
         for (const val of unselected) list.appendChild(this.createItem(val, false));
 
         if (selected.length === 0 && unselected.length === 0 && !this.isLoading) {
-            const empty = this.el_div("sts-empty");
+            const empty = this.div("sts-empty");
             empty.textContent = this.allValues.length === 0 ? "No data bound" : "No results";
             list.appendChild(empty);
         }
@@ -255,10 +272,10 @@ export class Visual implements IVisual {
     }
 
     private createItem(value: string, checked: boolean): HTMLElement {
-        const item = this.el_div("sts-item" + (checked ? " sts-item--checked" : ""));
+        const item = this.div("sts-item" + (checked ? " sts-item--checked" : ""));
 
-        const check = this.el_span("sts-check" + (checked ? " sts-check--on" : ""));
-        const label = this.el_span("sts-label");
+        const check = this.span("sts-check" + (checked ? " sts-check--on" : ""));
+        const label = this.span("sts-label");
         label.textContent = value;
 
         item.appendChild(check);
@@ -323,12 +340,31 @@ export class Visual implements IVisual {
         const values = Array.from(this.selectedValues);
 
         if (values.length === 0) {
-            this.host.applyJsonFilter(null, "general", "filter", powerbi.FilterAction.remove);
+            // Empty cast: IFilter is an empty interface, any object satisfies it.
+            // FilterAction.remove clears the filter regardless of the filter value.
+            this.host.applyJsonFilter(
+                {} as powerbi.IFilter,
+                "general",
+                "filter",
+                powerbi.FilterAction.remove
+            );
             return;
         }
 
-        const filter = new BasicFilter(this.filterTarget, "In", values);
-        this.host.applyJsonFilter(filter, "general", "filter", powerbi.FilterAction.merge);
+        const filter: IBasicFilter = {
+            $schema: "http://powerbi.com/product/schema#basic",
+            target: this.filterTarget,
+            filterType: 1,
+            operator: "In",
+            values
+        };
+
+        this.host.applyJsonFilter(
+            filter as unknown as powerbi.IFilter,
+            "general",
+            "filter",
+            powerbi.FilterAction.merge
+        );
     }
 
     private persistSelection(): void {
@@ -337,7 +373,8 @@ export class Visual implements IVisual {
             merge: [{
                 objectName: "general",
                 properties: { selection: JSON.stringify(values) },
-                selector: null
+                // null selector = visual-level property (not data-point bound)
+                selector: null as unknown as powerbi.data.Selector
             }]
         });
     }

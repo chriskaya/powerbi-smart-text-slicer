@@ -5,7 +5,7 @@
         "displayName": "Smart Text Slicer",
         "guid": "smartTextSlicer4F9A2D1B8E3C5067",
         "visualClassName": "Visual",
-        "version": "1.0.0",
+        "version": "1.0.0.0",
         "description": "A searchable dropdown slicer with multi-select and asynchronous data loading for large datasets.",
         "supportUrl": "https://github.com/chriskaya/powerbi-smart-text-slicer",
         "gitHubUrl": "https://github.com/chriskaya/powerbi-smart-text-slicer"

@@ -66,7 +66,6 @@ if (tsFiles.length === 0) {
 const ALLOWED_RUNTIME_SCOPES = ["powerbi-", "@microsoft/", "@types/"];
 const ALLOWED_RUNTIME_PACKAGES = new Set([
     "powerbi-visuals-api",
-    "powerbi-models",
 ]);
 
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));

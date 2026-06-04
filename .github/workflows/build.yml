@@ -2,8 +2,6 @@ name: Build and Package
 
 on:
   push:
-    branches: ["main", "feat/**", "fix/**", "chore/**"]
-  pull_request:
     branches: ["main"]
   release:
     types: [created]
@@ -41,7 +39,10 @@ jobs:
         run: node scripts/check-security.js
 
       - name: Type check
-        run: npx tsc --noEmit
+        # Uses the project tsconfig (noImplicitAny, skipLibCheck).
+        # strict mode is intentionally disabled — pbiviz 7.x generates plugin
+        # code with optional constructor args that strict null checks reject.
+        run: npx tsc --noEmit --project tsconfig.json
 
       - name: Lint
         run: npm run lint

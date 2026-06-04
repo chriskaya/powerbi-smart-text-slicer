@@ -31,12 +31,13 @@
                     "type": { "filter": {} }
                 },
                 "selection": {
-                    "type": { "text": {} }
+                    "type": { "text": true }
                 }
             }
         }
     },
     "supportsHighlight": false,
     "suppressDefaultTitle": true,
-    "supportsSynchronizingFilterState": true
+    "supportsSynchronizingFilterState": true,
+    "privileges": []
 }

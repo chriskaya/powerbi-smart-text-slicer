@@ -5,3 +5,4 @@ coverage/
 *.pbiviz
 assets/icon.png
 .env
+webpack.statistics.prod.html
