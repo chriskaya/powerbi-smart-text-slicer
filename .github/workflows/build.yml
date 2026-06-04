@@ -2,8 +2,6 @@ name: Build and Package
 
 on:
   push:
-    branches: ["main", "feat/**", "fix/**", "chore/**"]
-  pull_request:
     branches: ["main"]
   release:
     types: [created]
@@ -28,12 +26,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ── Quality gates ──────────────────────────────────────────────────────
+
+      - name: Audit dependencies (high+ only)
+        # Fails on high or critical severity vulnerabilities.
+        # Moderate findings in the build toolchain are tracked but not blocking.
+        run: npm audit --audit-level=high
+
+      - name: Static security scan
+        # Blocks forbidden APIs (innerHTML, eval, fetch, WebSocket…) and
+        # validates that all runtime dependencies are from approved publishers.
+        run: node scripts/check-security.js
+
+      - name: Type check
+        # Uses the project tsconfig (noImplicitAny, skipLibCheck).
+        # strict mode is intentionally disabled — pbiviz 7.x generates plugin
+        # code with optional constructor args that strict null checks reject.
+        run: npx tsc --noEmit --project tsconfig.json
+
       - name: Lint
         run: npm run lint
 
+      # ── Build ──────────────────────────────────────────────────────────────
+
       - name: Package visual
         run: npm run package
-        # prepackage (generate-icon.js) runs automatically before this
+        # prepackage (generate-icon.js) runs automatically before this step
+
+      # ── Artifacts ─────────────────────────────────────────────────────────
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

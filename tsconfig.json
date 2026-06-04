@@ -4,14 +4,12 @@
         "target": "ES6",
         "module": "ES2015",
         "moduleResolution": "node",
-        "strict": true,
         "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": true,
         "lib": ["es6", "dom"],
         "sourceMap": true,
         "outDir": ".tmp/build/src",
-        "rootDir": "src",
-        "declaration": true
+        "declaration": true,
+        "skipLibCheck": true
     },
-    "include": ["src/**/*.ts"]
+    "files": ["src/visual.ts"]
 }
