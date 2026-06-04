@@ -49,6 +49,19 @@ jobs:
 
       # ── Build ──────────────────────────────────────────────────────────────
 
+      - name: Sync version to pbiviz.json
+        # release-please updates package.json (semver). pbiviz.json requires
+        # a 4-part version; this step appends .0 to keep both in sync.
+        run: |
+          node -e "
+            const fs = require('fs');
+            const version = require('./package.json').version + '.0';
+            const pbiviz = JSON.parse(fs.readFileSync('pbiviz.json', 'utf8'));
+            pbiviz.visual.version = version;
+            fs.writeFileSync('pbiviz.json', JSON.stringify(pbiviz, null, 4) + '\n');
+            console.log('pbiviz.json version set to ' + version);
+          "
+
       - name: Package visual
         run: npm run package
         # prepackage (generate-icon.js) runs automatically before this step
