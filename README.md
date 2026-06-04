@@ -41,12 +41,13 @@ Every DOM element is created with `document.createElement`. Text content is assi
 
 ### Dependencies
 
-The packaged `.pbiviz` file bundles **only two Microsoft-published runtime packages**:
+The packaged `.pbiviz` file bundles **one Microsoft-published runtime package**:
 
 | Package | Publisher | Purpose |
 |---|---|---|
-| `powerbi-visuals-api` | Microsoft | IVisual interface and host types |
-| `powerbi-models` | Microsoft | BasicFilter model for the filter API |
+| `powerbi-visuals-api` | Microsoft | IVisual interface, host APIs, and type definitions |
+
+The `BasicFilter` structure is implemented inline as a plain JSON object matching Power BI's `http://powerbi.com/product/schema#basic` schema — no external filter library is required.
 
 Build tools (`powerbi-visuals-tools`, `typescript`, `eslint`) are dev-only and are never included in the packaged visual.
 
