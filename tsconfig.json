@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "target": "ES6",
+        "target": "ES2022",
         "module": "ES2015",
         "moduleResolution": "node",
         "noImplicitAny": true,
-        "lib": ["es6", "dom"],
+        "strictNullChecks": true,
+        "noEmitOnError": true,
+        "lib": ["ES2022", "dom"],
         "sourceMap": true,
         "outDir": ".tmp/build/src",
         "declaration": true,
